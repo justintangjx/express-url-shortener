@@ -8,6 +8,22 @@ const decode = require("./demo/decode");
 const app = express();
 app.use(bodyParser.json());
 
+const existingURLs = [
+  { id: "1", url: "www.google.com", hash: "MQ==" },
+  { id: "2", url: "www.facebook.com", hash: "Mg==" }
+];
+
+const hash = encode((request.url), existingURLs);
+
+app.post("/shorten-url", function(request, respond) {
+  var shortenedUrl = {
+    id: existingURLs.length + 1,
+    url: request.body,
+    hash: hash
+  };
+  respond.send(hash);
+});
+
 // TODO: Implement functionalities specified in README
 app.get("/", function(req, res) {
   res.send("Hello world!");
