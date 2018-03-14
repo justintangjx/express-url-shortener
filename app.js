@@ -1,3 +1,4 @@
+// import decode from "./demo/decode";
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -13,16 +14,59 @@ const existingURLs = [
   { id: "2", url: "www.facebook.com", hash: "Mg==" }
 ];
 
-const hash = encode((request.url), existingURLs);
-
 app.post("/shorten-url", function(request, respond) {
+  const hash = encode(request.url, existingURLs);
   var shortenedUrl = {
     id: existingURLs.length + 1,
-    url: request.body,
+    url: request.url,
     hash: hash
   };
   respond.send(hash);
 });
+
+app.get("/expand-url/:hash", function(request, respond) {
+  try {
+    const decodedUrl = decode(request.params.hash, existingURLs);
+    
+    respond.status(200);
+    respond.send({
+      url:decodedUrl
+    });
+  } catch (error) {
+    respond.status(404);
+    respond.send({
+      message: `There is no long URL registered for hash value ${
+        request.params.hash
+      }`
+    });
+  }
+});
+
+app.delete("/delete-url/:hash", function(request, respond) {
+  try {
+    const shortUrlToDelete = decode(request.params.hash, existingURLs);
+    const urlToRemove = existingURLs.filter(item => item["url"] === shortUrlToDelete);
+    delete urlToRemove;
+    respond.status(200);
+    respond.send({
+      message: `${shortUrlToDelete} with hash value ${request.params.hash} deleted successfully`
+    });
+  } catch (error) {
+    respond.status(404);
+    respond.send(
+      // message:
+       `Url with hash value ${request.params.hash} does not exist`
+    );
+  }
+});
+
+// app.get("/:someHash", function (request, respond) {
+//   try {
+//     const urlToRedirect = decode(request.params.hash, existingURLs);
+//   } catch (error) {
+    
+//   }
+// })
 
 // TODO: Implement functionalities specified in README
 app.get("/", function(req, res) {
@@ -44,7 +88,8 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  console.log(err);
+  res.send("error");
 });
 
 module.exports = app;
