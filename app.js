@@ -45,12 +45,15 @@ app.get("/expand-url/:hash", function(request, respond) {
 app.delete("/delete-url/:hash", function(request, respond) {
   try {
     const shortUrlToDelete = decode(request.params.hash, existingURLs);
-    const urlToRemove = existingURLs.filter(item => item["url"] === shortUrlToDelete);
-    for(var i = 0; i <= existingURLs.length; i++) {
-      if(existingURLs.length[i]["url"] === urlToRemove) {
-        delete existingURLs.length[i];
+    // const urlToRemove = existingURLs.filter(item => item["url"] === shortUrlToDelete);
+    let indexToDelete = -1;
+    for(var i = 0; i < existingURLs.length; i++) {
+      if(existingURLs[i]["hash"] === request.params.hash) {
+        indexToDelete = i;
       };
     };
+    existingURLs.splice(indexToDelete, 1);
+
     respond.status(200);
     respond.send({
       message: `${shortUrlToDelete} with hash value ${request.params.hash} deleted successfully`
