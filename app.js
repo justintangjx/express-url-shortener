@@ -46,7 +46,11 @@ app.delete("/delete-url/:hash", function(request, respond) {
   try {
     const shortUrlToDelete = decode(request.params.hash, existingURLs);
     const urlToRemove = existingURLs.filter(item => item["url"] === shortUrlToDelete);
-    delete urlToRemove;
+    for(var i = 0; i <= existingURLs.length; i++) {
+      if(existingURLs.length[i]["url"] === urlToRemove) {
+        delete existingURLs.length[i];
+      };
+    };
     respond.status(200);
     respond.send({
       message: `${shortUrlToDelete} with hash value ${request.params.hash} deleted successfully`
